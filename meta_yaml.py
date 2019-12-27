@@ -115,13 +115,25 @@ class MetaYamlPreprocessor(Preprocessor):
 #               self.markdown.update(meta)
 #           else:
 #               self.markdown.Meta = meta
+             # even hackier work aroudn to make this work now that
+             # pelican is reusing the md object
+             def silly_get(this):
+                 if not hasattr(this, "_Meta_data"):
+                     this._Meta_data = {}
+                 
+                 return this._Meta_data
+ 
+             def silly_set(this, value):
+                 if not hasattr(this, "_Meta_data"):
+                     this._Meta_data = {}                
+                this._Meta_data.update(value)
 
             # hacky quick fix for the moment (see above)
             if hasattr(self.markdown, 'Meta'):
                 self.markdown._Meta_data = self.markdown.Meta
             else:
                 self.markdown._Meta_data = {}
-            self.markdown.__class__.Meta = property(lambda self: self._Meta_data, lambda self, value: self._Meta_data.update(value))
+            self.markdown.__class__.Meta = property(silly_get, silly_set)
             self.markdown.Meta = meta
 
         return lines
