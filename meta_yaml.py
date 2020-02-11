@@ -126,7 +126,7 @@ class MetaYamlPreprocessor(Preprocessor):
             def meta_data_set(this, value):
                 if not hasattr(this, "_Meta_data"):
                     this._Meta_data = {}
-            this._Meta_data.update(value)
+                this._Meta_data.update(value)
 
             # hacky quick fix for the moment (see above)
             if hasattr(self.markdown, 'Meta'):
