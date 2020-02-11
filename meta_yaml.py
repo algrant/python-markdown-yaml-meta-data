@@ -109,31 +109,31 @@ class MetaYamlPreprocessor(Preprocessor):
             # Compat with PyMarkdown's meta: Keys are lowercase, values are lists
             meta = {k.lower(): v if isinstance(v, list) else [v] for k, v in meta.items()}
 
-#           # this is what the code should look like, if the Markdown "meta"
-#           # extension would tolerate other extensions writing to markdown.Meta
-#           if hasattr(self.markdown, 'Meta'):
-#               self.markdown.update(meta)
-#           else:
-#               self.markdown.Meta = meta
-             # even hackier work aroudn to make this work now that
-             # pelican is reusing the md object
-             def silly_get(this):
-                 if not hasattr(this, "_Meta_data"):
-                     this._Meta_data = {}
-                 
-                 return this._Meta_data
- 
-             def silly_set(this, value):
-                 if not hasattr(this, "_Meta_data"):
-                     this._Meta_data = {}                
-                this._Meta_data.update(value)
+            #           # this is what the code should look like, if the Markdown "meta"
+            #           # extension would tolerate other extensions writing to markdown.Meta
+            #           if hasattr(self.markdown, 'Meta'):
+            #               self.markdown.update(meta)
+            #           else:
+            #               self.markdown.Meta = meta
+
+            # even hackier work around to make this work now that
+            # pelican is reusing the md object
+            def meta_data_get(this):
+                if not hasattr(this, "_Meta_data"):
+                    this._Meta_data = {}
+                return this._Meta_data
+
+            def meta_data_set(this, value):
+                if not hasattr(this, "_Meta_data"):
+                    this._Meta_data = {}
+            this._Meta_data.update(value)
 
             # hacky quick fix for the moment (see above)
             if hasattr(self.markdown, 'Meta'):
                 self.markdown._Meta_data = self.markdown.Meta
             else:
                 self.markdown._Meta_data = {}
-            self.markdown.__class__.Meta = property(silly_get, silly_set)
+            self.markdown.__class__.Meta = property(meta_data_get, meta_data_set)
             self.markdown.Meta = meta
 
         return lines
